@@ -42,7 +42,7 @@ class AlienContact(BaseModel):
         return self
 
 
-def display_contact(contact: AlienContact) -> None:
+def show_contact(contact: AlienContact) -> None:
     print(f"ID: {contact.contact_id}")
     print(f"Type: {contact.contact_type.value}")
     print(f"Location: {contact.location}")
@@ -69,10 +69,11 @@ def main() -> None:
             is_verified=False,
         )
         print("Valid contact report:")
-        display_contact(contact)
+        show_contact(contact)
     except ValidationError:
         print("Failed to create valid contact report")
 
+    print()
     print("======================================")
 
     try:
