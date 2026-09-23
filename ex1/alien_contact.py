@@ -1,3 +1,6 @@
+# Egzersiz 1 - uzaylı temas kayıtları
+# Tek alanla kontrol edilemeyen iş kurallarını model_validator ile yazdım
+
 from datetime import datetime
 from enum import Enum
 
@@ -24,12 +27,17 @@ class AlienContact(BaseModel):
     message_received: str | None = Field(default=None, max_length=500)
     is_verified: bool = False
 
+    # after modunda tüm alanlar doğrulanmış oluyor,
+    # sonunda self döndürmek gerekiyor
     @model_validator(mode="after")
     def check_business_rules(self) -> "AlienContact":
+        # AC ön eki zorunlu
         if not self.contact_id.startswith("AC"):
             raise ValueError("Contact ID must start with 'AC'")
+        # fiziksel temas doğrulanmadan kaydedilemez
         if self.contact_type == ContactType.PHYSICAL and not self.is_verified:
             raise ValueError("Physical contact reports must be verified")
+        # telepatik temas için en az 3 tanık şart
         if (
             self.contact_type == ContactType.TELEPATHIC
             and self.witness_count < 3
@@ -37,6 +45,7 @@ class AlienContact(BaseModel):
             raise ValueError(
                 "Telepathic contact requires at least 3 witnesses"
             )
+        # sinyal 7.0'dan güçlüyse mesaj alanı da dolu olmalı
         if self.signal_strength > 7.0 and not self.message_received:
             raise ValueError("Strong signals should include received messages")
         return self
@@ -56,6 +65,7 @@ def main() -> None:
     print("Alien Contact Log Validation")
     print("======================================")
 
+    # geçerli rapor tüm kuralları geçiyor
     try:
         contact = AlienContact(
             contact_id="AC_2024_001",
@@ -76,6 +86,7 @@ def main() -> None:
     print()
     print("======================================")
 
+    # tek tanıklı telepatik rapor kurala takılıyor
     try:
         AlienContact(
             contact_id="AC_2024_002",
